@@ -134,8 +134,10 @@ public class FuseLabelService extends BaseURSAService implements FedExLabelServi
             in.put((long) UVConstants.FDXPSP_I_SERVICE, modeCode);
             in.put((long) UVConstants.FDXPSP_I_PACKAGING, "01");
             in.put((long) UVConstants.FDXPSP_I_PACKAGE_PAYER_TYPE, "S");
+
             in.put((long) UVConstants.FDXPSP_I_TRACKING_NUMBER, transitDetails.getTrackingNo());
-            in.put((long) UVConstants.FDXPSP_I_PACKAGE_SHIPPER_ACCT, entityAccountNo); //use account-level EAN for express modes
+            //tbd
+            in.put((long) UVConstants.FDXPSP_I_PACKAGE_SHIPPER_ACCT, entityAccountNo);
 
             FedExServiceInfo fedExServiceInfo = CustomLabelHelper.getServiceDetailsByMode(fedExModeConfig,
                     transitMode);
@@ -169,13 +171,10 @@ public class FuseLabelService extends BaseURSAService implements FedExLabelServi
             if (GROUND_ECONOMY_MODE.equals(transitMode)) {
                 in.put((long) UVConstants.FDXPSP_I_USPS_MAILER_ID, carrierMetaDataMap.get(SMART_POST_METER_ID)); //SPMID
                 in.put((long) UVConstants.FDXPSP_I_USPS_PACKAGE_SEQ_NBR, String.format("%07d", packageSequenceHelper.getPackageSeqByAccountNo(carrierMetaDataMap.get(ACCOUNT_TO_BILL))));
+                in.put((long) UVConstants.FDXPSP_I_PACKAGE_SHIPPER_ACCT, carrierMetaDataMap.get(ACCOUNT_GSN)); //Use Account Level GSN
                 in.put((long) UVConstants.FDXPSP_I_USPS_INDICIA_TYPE, "1");
                 in.put((long) UVConstants.FDXPSP_I_IFACE_METHOD, UVConstants.PSPLUS_METHOD_SHIPMENT_CREATE); //No need for 2D Barcode in Ground Economy
                 addSmartPostReleaseAndEnd(in, orderDetails.isPOBox(), orderDetails.isMilitary());
-            }
-
-            if (GROUND_ECONOMY_MODE.equals(transitMode) || isGroundOrHome(transitMode)) {
-                in.put((long) UVConstants.FDXPSP_I_PACKAGE_SHIPPER_ACCT, carrierMetaDataMap.get(ACCOUNT_GSN)); //use account-level GSN for Ground, Home, SP modes
             }
 
             in.put((long) UVConstants.FDXPSP_I_DEST_ADDRESS_LINE1, addressTo.getDescription1());
